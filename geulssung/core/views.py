@@ -10,7 +10,7 @@ def home_view(request):
 
 # /write로 연결 되는 글쓰기 페이지 입니다.
 def write_post_view(request):
-    return render(request, 'post/write_form.html')
+    return render(request, 'post/write_1.html')
 
 
 

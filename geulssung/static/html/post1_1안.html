@@ -1,0 +1,125 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>글쓰기 ✍️</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Gowun+Batang&display=swap');
+    body { font-family: 'Gowun Batang', serif; }
+  </style>
+</head>
+<body class="bg-[#FFF9F2] min-h-screen p-8">
+
+  <div class="w-full max-w-5xl mx-auto px-4 py-6 bg-white rounded-xl shadow-md">
+    
+
+<!-- 1단계 글감 노출 -->
+<div class="table w-full mb-8 bg-white rounded-xl border border-[#EADFD0]">
+  <div class="table-header-group bg-[#FFFBF0]">
+    <div class="table-row text-[#5E5246] font-semibold text-sm">
+      <div class="table-cell w-2/4 text-center py-3">주제</div>
+      <div class="table-cell w-1/4 text-center py-3">분류</div>
+      <div class="table-cell w-1/4 text-center py-3">언급횟수</div>
+    </div>
+  </div>
+  <div class="table-row-group">
+    <div class="table-row text-[#5E5246] text-sm">
+      <div class="table-cell text-center py-2">여기에 api로 끌어온 데이터를</div>
+      <div class="table-cell text-center py-2">보여줄 것입니다</div>
+      <div class="table-cell text-center py-2">!!!!!</div>
+    </div>
+  </div>
+    <div class="table-row-group">
+    <div class="table-row text-[#5E5246] text-sm">
+      <div class="table-cell text-center py-2">가능하겠죠?</div>
+      <div class="table-cell text-center py-2">그렇겠죠?</div>
+      <div class="table-cell text-center py-2">파이텡</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- 2단계 오늘의 글쓰기 도우미 선택 -->
+ <style>
+  .radio-wrapper {
+    display: flex;
+    gap: 60px; /* 사이 간격 */
+    justify-content: left;
+    align-items: flex-start;
+  }
+
+  label.radio-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  input[type="radio"] {
+    margin-bottom: 10px; /* 이미지 위에 라디오 버튼 */
+  }
+
+  .image-label {
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+
+  input[type="radio"]:checked + .image-label {
+    transform: scale(1.05);
+    border: 2px solid #493E3E;
+    border-radius: 8px;
+  }
+</style>
+
+<div class="mb-8">
+  <p class="font-semibold text-[#493E3E]">오늘의 글쓰기 도우미</p>
+</div>
+<div class="mb-8">
+  <div class="radio-wrapper">
+    
+    <!-- 글썽이 -->
+    <label class="radio-block">
+      <input type="radio" name="category" value="emotion" onchange="showGenres(this.value)">
+      <img class="w-[250px]" src="{% static 'image/geulssung.png' %}" alt="F감성 글썽이" class="image-label image-option">
+    </label>
+
+    <!-- 말썽이 -->
+    <label class="radio-block">
+      <input type="radio" name="category" value="logic" onchange="showGenres(this.value)">
+      <img class="w-[175px]" src="{% static 'image/malssung.png' %}" alt="T감성 말썽이" class="image-label w-[150px]">
+    </label>
+
+  </div>
+</div>
+
+
+    <!-- JS: 상위 카테고리 선택 + 형식별 가이드 표시 -->
+<script>
+    function showGenres(category) {
+      // 상위 카테고리에 따라 하위 장르 블록 표시
+      document.getElementById('genre-logic').style.display = category === 'logic' ? 'block' : 'none';
+      document.getElementById('genre-emotion').style.display = category === 'emotion' ? 'block' : 'none';
+  
+      // 선택 초기화 (기존 가이드 숨기기)
+      const all = ['column', 'analysis', 'essay', 'poem'];
+      all.forEach(id => {
+        const div = document.getElementById(`guide-${id}`);
+        if (div) div.style.display = 'none';
+      });
+    }
+  
+    function showGuide(value) {
+      // 선택한 장르의 가이드만 보여주기
+      const all = ['column', 'analysis', 'essay', 'poem'];
+      all.forEach(id => {
+        const div = document.getElementById(`guide-${id}`);
+        if (div) div.style.display = 'none';
+      });
+      const target = document.getElementById(`guide-${value}`);
+      if (target) target.style.display = 'block';
+    }
+  </script>
+  
+</body>
+</html>

@@ -1,0 +1,306 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>글쓰기 ✍️</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Gowun+Batang&display=swap');
+    body { font-family: 'Gowun Batang', serif; }
+  </style>
+</head>
+<body class="bg-[#FFF9F2] min-h-screen p-8">
+
+  <div class="w-full max-w-5xl mx-auto px-4 py-6 bg-white rounded-xl shadow-md">
+
+    
+<!-- 스타일 -->
+ <style>
+  /* ✅ 1단계: 캐릭터 선택용 이미지 라디오 버튼 정렬 및 스타일 */
+  .radio-wrapper {
+    display: flex;
+    gap: 60px;
+    justify-content: center;
+  }
+
+  label.radio-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  input[type="radio"] {
+    margin-bottom: 10px;
+  }
+
+  .image-label {
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+
+  /* ✅ 2단계: 장르 선택 버튼 기본 스타일 */
+  .genre-btn {
+    display: inline-block;
+    padding: 0.5rem 1.25rem;
+    margin: 0 0.5rem;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    background-color: #fdfdfd;
+    transition: all 0.2s ease;
+    color: #333;
+    text-align: center;
+  }
+
+  /* ✅ 마우스 오버 시 장르 버튼 스타일 변경 */
+  .genre-btn:hover {
+    background-color: #f5f5f5;
+    border-color: #bbb;
+  }
+
+  /* ✅ 선택된 장르 버튼에 강조 효과 */
+  input[type="radio"]:checked + label.genre-btn {
+    background-color: #fbeedc;
+    border-color: #493E3E;
+    color: #493E3E;
+  }
+
+  /* ✅ 포커스 시(선택했을 때) 커서 테두리 제거 → 깔끔한 버튼 느낌 */
+  .genre-btn:focus {
+    outline: none;
+    box-shadow: none;
+  }
+
+  /* ✅ peer 클래스를 사용할 경우에도 포커스 제거 적용 (접근성 고려한 확장 대응) */
+  input[type="radio"].peer:focus + label.genre-btn {
+    outline: none;
+    box-shadow: none;
+  }
+
+  /* ✅ step */
+.step-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: 2px solid #ccc;
+  background-color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* 현재 진행 중인 단계 */
+.step-current {
+  background-color: #FFE8CC;
+  border-color: #FF9800;
+  color: #BF360C;
+}
+
+.step-btn:hover {
+  opacity: 0.70;
+}
+</style>
+
+
+<!-- 0단계: 현 스텝 이미지 표현 -->
+<div id="step-nav" class="mb-10 flex flex-wrap justify-center gap-2 text-sm md:text-base">
+
+  <button onclick="moveToStep(1)" class="step-btn step-default" id="step-1">1. 🤔💭</button>
+  <button onclick="moveToStep(2)" class="step-btn step-default" id="step-2">2. 💧</button>
+  <button onclick="moveToStep(3)" class="step-btn step-default" id="step-3">3. 💧💧</button>
+  <button onclick="moveToStep(4)" class="step-btn step-default" id="step-4">4. 💧💧💧</button>
+  <button onclick="moveToStep(5)" class="step-btn step-default" id="step-5">5. ✍🏻</button>
+
+</div>
+
+
+<!-- 1단계: 글썽이/말썽이 선택 -->
+<div class="mb-8">
+  <p class="font-semibold text-[#493E3E] text-center">오늘의 글쓰기 도우미</p>
+</div>
+<div class="mb-8">
+  <div class="radio-wrapper">
+    
+    <!-- 글썽이 -->
+    <label class="radio-block">
+      <input type="radio" name="category" value="emotion" onchange="showGenres(this.value)">
+      <img class="w-[250px]" src="{% static 'image/geulssung.png' %}" alt="F감성 글썽이" class="image-label image-option">
+    </label>
+
+    <!-- 말썽이 -->
+    <label class="radio-block">
+      <input type="radio" name="category" value="logic" onchange="showGenres(this.value)">
+      <img class="w-[175px]" src="{% static 'image/malssung.png' %}" alt="T감성 말썽이" class="image-label w-[150px]">
+    </label>
+
+  </div>
+</div>
+
+
+
+<!-- 2단계: 하위 장르 -->
+<div class="mb-14" id="genre-emotion" style="display:none;">
+  <p class="text-center font-semibold text-[#493E3E] mb-4">형식을 골라보세요 (글썽이)</p>
+  <div class="flex justify-center gap-4">
+    <!-- 버튼처럼 보이는 라디오 버튼 -->
+    <input type="radio" name="genre" value="essay" id="genre-essay" class="hidden peer" onchange="articleSource(this.value)">
+    <label for="genre-essay" class="genre-btn">에세이</label>
+    <input type="radio" name="genre" value="poem" id="genre-poem" class="hidden peer" onchange="articleSource(this.value)">
+    <label for="genre-poem" class="genre-btn">시</label>
+  </div>
+</div>
+<div class="mb-14" id="genre-logic" style="display:none;">
+  <p class="text-center font-semibold text-[#493E3E] mb-4">형식을 골라보세요 (말썽이)</p>
+  <div class="flex justify-center gap-4">
+    <input type="radio" name="genre" value="column" id="genre-column" class="hidden peer" onchange="articleSource(this.value)">
+    <label for="genre-column" class="genre-btn">칼럼</label>
+    <input type="radio" name="genre" value="analysis" id="genre-analysis" class="hidden peer" onchange="articleSource(this.value)">
+    <label for="genre-analysis" class="genre-btn">분석글</label>
+  </div>
+</div>
+
+
+
+<!-- 3단계: 글감 보여주기 -->
+<!-- 3-1 컬럼 글감 -->
+<div class="mb-14" id="prompt-column" style="display:none;"> 
+  <p class="text-center font-semibold text-[#493E3E] mb-4">칼럼 글감을 선택해주세요.</p>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 justify-center">
+    <input type="radio" name="prompt" id="column1" value="column" class="hidden peer" onchange="articleSource(this.value)">
+    <label for="column1" class="genre-btn">1</label>
+
+    <input type="radio" name="prompt" id="column2" value="column" class="hidden peer" onchange="articleSource(this.value)">
+    <label for="column2" class="genre-btn">2</label>
+
+    <input type="radio" name="prompt" id="column3" value="column" class="hidden peer" onchange="articleSource(this.value)">
+    <label for="column3" class="genre-btn">3</label>
+
+    <input type="radio" name="prompt" id="column4" value="column" class="hidden peer" onchange="articleSource(this.value)">
+    <label for="column4" class="genre-btn">4</label>
+
+    <input type="radio" name="prompt" id="column5" value="column" class="hidden peer" onchange="articleSource(this.value)">
+    <label for="column5" class="genre-btn">5</label>
+
+    <input type="radio" name="prompt" id="column6" value="column" class="hidden peer" onchange="articleSource(this.value)">
+    <label for="column6" class="genre-btn">6</label>
+
+    <input type="radio" name="prompt" id="column7" value="column" class="hidden peer" onchange="articleSource(this.value)">
+    <label for="column7" class="genre-btn">7</label>
+
+    <input type="radio" name="prompt" id="column8" value="column" class="hidden peer" onchange="articleSource(this.value)">
+    <label for="column8" class="genre-btn">8</label>
+  </div>
+</div>
+<!-- 3-2 분석글 글감 -->
+<div class="mb-14" id="prompt-analysis" style="display:none;"> 
+  <p class="text-center font-semibold text-[#493E3E] mb-4">분석글 글감을 선택해주세요.</p>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 justify-center">
+    <input type="radio" name="prompt" id="analysis1" value="analysis" class="hidden peer" onchange="articleSource(this.value)">
+    <label for="analysis1" class="genre-btn">1</label>
+
+    <input type="radio" name="prompt" id="analysis2" value="analysis" class="hidden peer" onchange="articleSource(this.value)">
+    <label for="analysis2" class="genre-btn">2</label>
+
+    <input type="radio" name="prompt" id="analysis3" value="analysis" class="hidden peer" onchange="articleSource(this.value)">
+    <label for="analysis3" class="genre-btn">3</label>
+
+    <input type="radio" name="prompt" id="analysis4" value="analysis" class="hidden peer" onchange="articleSource(this.value)">
+    <label for="analysis4" class="genre-btn">4</label>
+
+    <input type="radio" name="prompt" id="analysis5" value="analysis" class="hidden peer" onchange="articleSource(this.value)">
+    <label for="analysis5" class="genre-btn">5</label>
+
+    <input type="radio" name="prompt" id="analysis6" value="analysis" class="hidden peer" onchange="articleSource(this.value)">
+    <label for="analysis6" class="genre-btn">6</label>
+
+    <input type="radio" name="prompt" id="analysis7" value="analysis" class="hidden peer" onchange="articleSource(this.value)">
+    <label for="analysis17" class="genre-btn">7</label>
+
+    <input type="radio" name="prompt" id="analysis8" value="analysis" class="hidden peer" onchange="articleSource(this.value)">
+    <label for="analysis18" class="genre-btn">8</label>
+  </div>
+</div>
+<!-- 3-3 시 글감 -->
+<div class="mb-14" id="prompt-poem" style="display:none;"> 
+  <p class="text-center font-semibold text-[#493E3E] mb-4">시 글감을 선택해주세요.</p>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 justify-center">
+    <input type="radio" name="prompt" id="poem1" value="poem" class="hidden peer" onchange="articleSource(this.value)">
+    <label for="poem1" class="genre-btn">1</label>
+
+    <input type="radio" name="prompt" id="poem2" value="poem" class="hidden peer" onchange="articleSource(this.value)">
+    <label for="poem2" class="genre-btn">2</label>
+
+    <input type="radio" name="prompt" id="poem3" value="poem" class="hidden peer" onchange="articleSource(this.value)">
+    <label for="poem3" class="genre-btn">3</label>
+
+    <input type="radio" name="prompt" id="poem4" value="poem" class="hidden peer" onchange="articleSource(this.value)">
+    <label for="poem4" class="genre-btn">4</label>
+
+    <input type="radio" name="prompt" id="poem5" value="poem" class="hidden peer" onchange="articleSource(this.value)">
+    <label for="poem5" class="genre-btn">5</label>
+
+    <input type="radio" name="prompt" id="poem6" value="poem" class="hidden peer" onchange="articleSource(this.value)">
+    <label for="poem6" class="genre-btn">6</label>
+
+    <input type="radio" name="prompt" id="poem7" value="poem" class="hidden peer" onchange="articleSource(this.value)">
+    <label for="poem7" class="genre-btn">7</label>
+
+    <input type="radio" name="prompt" id="poem8" value="poem" class="hidden peer" onchange="articleSource(this.value)">
+    <label for="poem8" class="genre-btn">8</label>
+  </div>
+</div>
+<!-- 3-4 에세이 글감 -->
+<div class="mb-14" id="prompt-essay" style="display:none;"> 
+  <p class="text-center font-semibold text-[#493E3E] mb-4">에세이 글감을 선택해주세요.</p>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 justify-center">
+    <input type="radio" name="prompt" id="essay1" value="essay" class="hidden peer" onchange="articleSource(this.value)">
+    <label for="essay1" class="genre-btn">1</label>
+
+    <input type="radio" name="prompt" id="essay2" value="essay" class="hidden peer" onchange="articleSource(this.value)">
+    <label for="essay2" class="genre-btn">2</label>
+
+    <input type="radio" name="prompt" id="essay3" value="essay" class="hidden peer" onchange="articleSource(this.value)">
+    <label for="essay3" class="genre-btn">3</label>
+
+    <input type="radio" name="prompt" id="essay4" value="essay" class="hidden peer" onchange="articleSource(this.value)">
+    <label for="essay4" class="genre-btn">4</label>
+
+    <input type="radio" name="prompt" id="essay5" value="essay" class="hidden peer" onchange="articleSource(this.value)">
+    <label for="essay5" class="genre-btn">5</label>
+
+    <input type="radio" name="prompt" id="essay6" value="essay" class="hidden peer" onchange="articleSource(this.value)">
+    <label for="essay6" class="genre-btn">6</label>
+
+    <input type="radio" name="prompt" id="essay7" value="essay" class="hidden peer" onchange="articleSource(this.value)">
+    <label for="essay7" class="genre-btn">7</label>
+
+    <input type="radio" name="prompt" id="essay8" value="essay" class="hidden peer" onchange="articleSource(this.value)">
+    <label for="essay8" class="genre-btn">8</label>
+  </div>
+</div>
+
+
+<!-- 가이드 -->
+  <div id="guide-box">
+    <div id="guide-column" style="display:none">{% include "post/_guide_column.html" %}</div>
+    <div id="guide-analysis" style="display:none">{% include "post/_guide_analysis.html" %}</div>
+    <div id="guide-essay" style="display:none">{% include "post/_guide_essay.html" %}</div>
+    <div id="guide-poem" style="display:none">{% include "post/_guide_poem.html" %}</div>
+  </div>
+
+
+ <!-- js 모듈 불러오기 -->
+
+<script type="module">
+  import { showGenres } from "{% static 'js/categoryHandler.js' %}";
+  window.showGenres = showGenres;
+  import { articleSource } from "{% static 'js/genreHandler.js' %}";
+  window.articleSource = articleSource;
+  import { moveToStep } from "{% static 'js/step.js' %}";
+  window.moveToStep = moveToStep;
+  document.addEventListener("DOMContentLoaded", () => {
+    moveToStep(1);
+  });
+</script>
+
