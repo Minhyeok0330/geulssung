@@ -13,7 +13,8 @@ User = get_user_model()
 def signup_view(request):
     if request.method == 'POST':
         username = request.POST['username']
-        password = request.POST['password']
+        password = request.POST.get('password1')
+        password_confirm = request.POST.get('password2')
         nickname = request.POST['nickname']
         email = request.POST['email']
 

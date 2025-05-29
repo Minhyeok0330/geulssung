@@ -25,6 +25,16 @@
       align-items: center;
       position: relative;
     }
+    .hand-img {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1;
+    }
+    .top-img {
+      top: 75px; /* 또는 적절한 위치 */
+      width: 330px; /* 예: 기존보다 더 크게 */
+    }
     .form-container {
       background-color: rgba(255, 255, 255, 0.9);
       border-radius: 5rem;
@@ -56,20 +66,20 @@
   </style>
 </head>
 <body>
+  <!-- 위쪽 글씨 -->
+   <img src="/static/images/함께 기깔난 글을....png" alt="위쪽 글씨" class="hand-img top-img">
+
+  <!-- 회원가입 박스 -->
   <div class="form-container">
-    <h2 class="text-4xl mb-2">✍️ 글썽글썽 회원가입</h2>
-    <p class="text-sm mb-4 text-[#6B5B5B]">글썽이와 함께 할 준비 되셨나요?</p>
+    <h2 class="text-4xl mb-2">🔐 로그인</h2>
     <form method="post">
       {% csrf_token %}
       <input type="text" name="username" placeholder="아이디" class="form-input" required>
-      <input type="text" name="nickname" placeholder="닉네임" class="form-input" required>
-      <input type="email" name="email" placeholder="이메일" class="form-input" required>
       <input type="password" name="password1" placeholder="비밀번호" class="form-input" required>
-      <input type="password" name="password2" placeholder="비밀번호 확인" class="form-input" required>
-      <button type="submit" class="form-button">가입하기</button>
+      <button type="submit" class="form-button">로그인</button>
     </form>
     <p class="mt-4 text-sm text-gray-600">
-      이미 계정이 있으신가요? <a href="{% url 'login' %}" class="underline">로그인하기</a>
+      계정이 없으신가요? <a href="{% url 'login' %}" class="underline">회원가입</a>
     </p>
   </div>
 </body>
