@@ -3,7 +3,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>{{ author.nickname }}님의 글자국</title>
+  <title>{{ author.nickname }}님의 글자국🐾</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang&display=swap" rel="stylesheet">
   <style>
@@ -31,17 +31,36 @@
       font-size: 0.95rem;
     }
   </style>
+
+<style>
+  .like-float {
+    position: absolute;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #f87171; /* 빨간색 */
+    animation: fadeUp 0.8s ease-out forwards;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  @keyframes fadeUp {
+    0% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+  }
+</style>
 </head>
 <body class="bg-[#bae6fd] min-h-screen p-10 text-[#493E3E]">
-  <div class="fixed top-0 left-0 right-0 bg-white border-b shadow px-6 py-3 flex justify-end gap-3 z-50">
-    <a href="{% url 'write' %}" class="bg-[#F9DCC4] hover:bg-[#f7cbaa] text-[#493E3E] font-bold px-4 py-2 rounded-full transition">✍️ 글쓰러 가기</a>
-    <a href="{% url 'home' %}" class="bg-[#F9DCC4] hover:bg-[#f7cbaa] text-[#493E3E] font-bold px-4 py-2 rounded-full transition">🏠 홈으로</a>
-  </div>
+  {% include "nav_bar.html" %}
   <div class="h-14"></div>
   <div class="max-w-6xl mx-auto mt-8">
 
-    <!-- 상단 제목 -->
-    <h1 class="text-3xl font-bold mb-6">{{ author.nickname }}님의 글자국 📂</h1>
+    <h1 class="text-3xl font-bold mb-6">{{ author.nickname }}님의 글자국🐾</h1>
     <br>
 
     {% if user.is_authenticated and user.id != author.id %}
@@ -63,55 +82,44 @@
       </div>
     {% endif %}
 
-    <!-- 게시글 카드 리스트 -->
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
       {% for post in posts %}
         <div class="relative card overflow-hidden">
-
-          <!-- 좋아요 버튼 위치 -->
-          {% if user != post.author %}
-            <form action="{% url 'like' post.id %}" method="post" class="absolute top-3 right-3 z-10">
-              {% csrf_token %}
-              <button type="submit" title="좋아요" class="text-red-400 hover:text-red-600 text-xl">
-                {% if user in post.like_users.all %}
-                  ❤️
-                {% else %}
-                  🤍
-                {% endif %}
-                <span class="text-sm align-middle">({{ post.like_users.count }})</span>
-              </button>
-            </form>
-          {% else %}
-            <!-- 자기 글일 경우 좋아요 수만 표시 -->
-            <div class="absolute top-3 right-3 z-10 text-red-400 text-xl">
-              ❤️ <span class="text-sm align-middle">({{ post.like_users.count }})</span>
-            </div>
-          {% endif %}
-
+          <!-- 커버 이미지 -->
           <a href="{% url 'post_detail' post_id=post.id %}">
-            <!-- 🖼 대표 이미지 -->
             {% if post.postimage %}
               <img src="{{ post.postimage.image.url }}" alt="커버 이미지" class="w-full aspect-square object-cover rounded-xl border-b" />
             {% else %}
               <img src="{% static 'images/피그민.png' %}" alt="기본 이미지" class="w-full aspect-square object-cover rounded-xl border-b" />
             {% endif %}
           </a>
-          <!-- 📌 텍스트 정보 -->
-          <div class="pt-4">
-            <div class="flex items-center justify-between mb-1">
-              <h2 class="card-title truncate">{{ post.title }}</h2>
-              {% if user.is_authenticated and user.id == author.id %}
-                <form method="post" action="{% url 'update_cover_image' post.id %}" enctype="multipart/form-data" class="ml-2" style="display:inline;">
-                  {% csrf_token %}
-                  <input type="file" name="cover_image" accept="image/*" required style="display:none;" onchange="this.form.submit()" id="coverImageInput-{{ post.id }}" />
-                  <button type="button"
-                    onclick="document.getElementById('coverImageInput-{{ post.id }}').click();"
-                    class="bg-[#F9DCC4] text-[#493E3E] font-bold text-xs px-3 py-1 rounded-full shadow hover:bg-[#f7cbaa] hover:text-[#2d2323] border border-[#f7cbaa] transition-all focus:outline-none focus:ring-2 focus:ring-[#F9DCC4]">
-                    커버 사진 변경
-                  </button>
-                </form>
+
+          <!-- 좋아요 버튼 (제목 위) -->
+          <div class="flex justify-start mt-2 mb-1">
+            {% if user.is_authenticated %}
+              {% if user == post.author %}
+              <div class="like-btn text-red-400 text-2xl font-bold flex items-center gap-1 pointer-events-none">
+                <span class="heart">❤️</span><span class="like-count text-sm align-middle">({{ post.like_users.count }})</span>
+                </div>
+              {% else %}
+                <button type="button"
+                        class="like-btn text-red-400 hover:text-red-600 text-2xl font-bold transition flex items-center gap-1"
+                        data-post-id="{{ post.id }}">
+                  {% if user in post.like_users.all %}
+                    <span class="heart">❤️</span><span class="like-count text-sm align-middle">({{ post.like_users.count }})</span>
+                  {% else %}
+                    <span class="heart">🤍</span><span class="like-count text-sm align-middle">({{ post.like_users.count }})</span>
+                  {% endif %}
+                </button>
               {% endif %}
-            </div>
+            {% endif %}
+          </div>
+
+          <!-- 제목 -->
+          <h2 class="card-title truncate text-left mb-2">{{ post.title }}</h2>
+
+          <!-- 메타 정보 -->
+          <div class="pt-2">
             <div class="flex justify-between items-center mt-3 text-sm card-meta">
               <span>
                 {% if post.genre == 'poem' %}#시
@@ -137,7 +145,7 @@
     if (followBtn) {
       followBtn.addEventListener('click', async function () {
         const userId = this.dataset.userId;
-  
+
         const response = await fetch("/geulssung/accounts/follow/", {
           method: "POST",
           headers: {
@@ -146,14 +154,54 @@
           },
           body: `user_id=${userId}`,
         });
-  
+
         const result = await response.json();
-  
         if (result.status === 'followed' || result.status === 'unfollowed') {
           location.reload();
         }
       });
     }
-  </script>  
+
+    document.querySelectorAll('.like-btn').forEach(btn => {
+  btn.addEventListener('click', async function () {
+    const postId = this.dataset.postId;
+    const response = await fetch("{% url 'like' 0 %}".replace('0', postId), {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": "{{ csrf_token }}",
+        "X-Requested-With": "XMLHttpRequest"
+      }
+    });
+
+    const data = await response.json();
+
+    const heart = this.querySelector('.heart');
+    const count = this.querySelector('.like-count');
+
+    // 애니메이션 효과 넣기
+    const float = document.createElement('div');
+    float.classList.add('like-float');
+    float.textContent = data.status === 'liked' ? '+1' : '-1';
+
+    // 버튼 위치 기준으로 float 위치 지정
+    const rect = this.getBoundingClientRect();
+    float.style.left = `${this.offsetLeft + 20}px`;
+    float.style.top = `${this.offsetTop - 10}px`;
+
+    // DOM에 삽입 (부모 기준 위치)
+    this.parentElement.appendChild(float);
+
+    // 0.8초 뒤 제거
+    setTimeout(() => {
+      float.remove();
+    }, 800);
+
+    // 하트 및 카운트 업데이트
+    heart.textContent = data.status === 'liked' ? '❤️' : '🤍';
+    count.textContent = `(${data.count})`;
+  });
+});
+
+  </script>
 </body>
 </html>

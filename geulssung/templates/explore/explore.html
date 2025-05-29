@@ -1,0 +1,97 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>글바다 🌍</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Gowun+Batang&display=swap');
+    body { font-family: 'Gowun Batang', serif; }
+
+    .scroll-wrapper {
+      overflow-x: auto;
+      overflow-y: hidden;
+      margin-bottom: 3rem;
+      white-space: nowrap;
+      scroll-behavior: smooth;
+      scrollbar-width: none; /* Firefox */
+    }
+    .scroll-wrapper::-webkit-scrollbar {
+      display: none; /* Chrome, Safari */
+    }
+    .scroll-wrapper.show-scrollbar {
+      scrollbar-width: thin;
+    }
+    .scroll-wrapper.show-scrollbar::-webkit-scrollbar {
+      display: block;
+      height: 8px;
+      background: #eee;
+    }
+    .scroll-wrapper.show-scrollbar::-webkit-scrollbar-thumb {
+      background: #ccc;
+      border-radius: 4px;
+    }
+
+    .scroll-track {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .scroll-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      background-color: rgba(255, 255, 255, 0.7);
+      padding: 0.5rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      transition: background-color 0.2s ease, opacity 0.2s;
+      pointer-events: auto;
+    }
+
+    .scroll-btn:hover {
+      background-color: rgba(255, 255, 255, 1);
+    }
+
+    .scroll-left {
+      left: -1.5rem;
+    }
+
+    .scroll-right {
+      right: -1.5rem;
+    }
+  </style>
+</head>
+<body class="bg-[#f0f9ff] min-h-screen text-[#493E3E] p-10">
+  <!-- 상단 네비게이션 -->
+  {% include "nav_bar.html" %}
+  
+  <div class="max-w-6xl mx-auto pt-20">
+    <h1 class="text-4xl font-bold mb-2 text-center">🌍 글바다</h1>
+
+    <!-- 구독글 섹션 -->
+    <div class="w-fit bg-white px-4 py-2 rounded-full shadow mb-6 ml-0 mx-auto font-semibold text-lg">내 구독글</div>
+    {% include "explore/_subscribed_posts.html" %}
+
+    <!-- 카테고리 필터 -->
+    {% include "explore/_category_filter.html" %}
+
+    <!-- 좌우 나뉜 콘텐츠 -->
+    <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 relative mt-6">
+      <!-- 좋아요 랭킹글 -->
+      {% include "explore/_top_liked_posts.html" %}
+      <!-- 최신글 -->
+      {% include "explore/_latest_posts.html" %}
+      <div class="hidden md:block absolute left-1/2 top-0 h-full border-l border-gray-300"></div>
+    </div>
+  </div>
+
+  <!-- 스크립트 -->
+  {% include "explore/_explore_scroll_script.html" %}
+</body>
+</html>
+
+{# 글바다(탐색) 메인 페이지 템플릿: 구독글, 카테고리 필터, 좋아요 랭킹, 최신글 등 전체 탐색 UI를 담당 #} 

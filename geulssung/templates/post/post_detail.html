@@ -40,6 +40,29 @@
       z-index: -10;
     }
   </style>
+
+<style>
+  .like-float {
+    position: absolute;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #f87171; /* 빨간색 */
+    animation: fadeUp 0.8s ease-out forwards;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  @keyframes fadeUp {
+    0% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+  }
+</style>
 </head>
 <body class="bg-[#FFF9F2] min-h-screen p-8 relative">
   <div class="blurred-bg"></div>
@@ -55,7 +78,7 @@
   </div>
 
   <!-- 상세보기 섹션 -->
-  <div id="detail-content" class="max-w-3xl mx-auto card mt-16">
+  <div id="detail-content" class="max-w-3xl mx-auto card mt-16 relative">
     <!-- 장르(한글) 및 주제 -->
     <p class="text-sm text-gray-600 mb-4">
       {% if post.genre == 'poem' %}
@@ -73,7 +96,26 @@
     </p>
 
     <!-- 제목 -->
-    <h1 class="card-title mb-2">{{ post.title }}</h1>
+    <div class="flex items-center justify-between mb-2">
+      <h1 class="card-title">{{ post.title }}</h1>
+      {% if user.is_authenticated and user != post.author %}
+        <button type="button"
+                id="like-btn"
+                class="like-btn text-red-400 hover:text-red-600 text-2xl font-bold transition flex items-center gap-1 ml-4"
+                data-post-id="{{ post.id }}">
+          {% if user in post.like_users.all %}
+            <span class="heart">❤️</span><span class="like-count text-sm align-middle">({{ post.like_users.count }})</span>
+          {% else %}
+            <span class="heart">🤍</span><span class="like-count text-sm align-middle">({{ post.like_users.count }})</span>
+          {% endif %}
+        </button>
+      {% elif user == post.author %}
+        <span class="text-red-400 text-2xl font-bold flex items-center gap-1 ml-4">
+          <span class="heart">❤️</span>
+          <span class="like-count text-sm align-middle">({{ post.like_users.count }})</span>
+        </span>
+      {% endif %}
+    </div>
 
     <!-- 작성자 및 작성일 -->
     <p class="text-sm text-gray-600 mb-6">by {{ post.author.nickname }} | {{ post.created_at|date:"Y.m.d H:i" }}</p>
@@ -112,42 +154,19 @@
     </div>
     <br>
     <hr>
-    {% if user == post.author %}
-      <form method="post" action="{% url 'toggle_post_visibility' post.id %}"
-            class="mt-8">
-        {% csrf_token %}
-        <div class="flex space-x-8">
-          {% if not post.is_public %}
-            <input type="hidden" name="visibility" value="public">
-            <button type="submit"
-                    class="px-6 py-2 bg-[#F9DCC4] hover:bg-[#f7cbaa] text-[#493E3E] rounded-full font-bold transition">
-              발행
-            </button>
-          {% else %}
-            <input type="hidden" name="visibility" value="private">
-            <button type="submit"
-                    class="px-6 py-2 bg-gray-300 hover:bg-gray-400 text-[#493E3E] rounded-full font-bold transition">
-              발행취소
-            </button>
-          {% endif %}
-        </div>
-      </form>
-    {% endif %}
-
-
-    <!-- 유저페이지 이동 버튼 -->
-    <div class="flex justify-end space-x-4 mt-8">
+    <div class="flex justify-center mt-6 space-x-4">
       <a href="{% url 'home' %}"
-        class="px-6 py-3 bg-[#F9DCC4] hover:bg-[#f7cbaa] text-[#493E3E] rounded-full font-bold transition">
-        홈으로 이동
+        class="px-5 py-2 bg-[#F9DCC4] hover:bg-[#f7cbaa] text-[#493E3E] rounded-full font-bold transition">
+        홈으로🏠
       </a>
       <a href="{% url 'public_user_posts' post.author.nickname %}"
-        class="px-6 py-3 bg-[#F9DCC4] hover:bg-[#f7cbaa] text-[#493E3E] rounded-full font-bold transition">
-        글자국으로 이동
+        class="px-5 py-2 bg-[#F9DCC4] hover:bg-[#f7cbaa] text-[#493E3E] rounded-full font-bold transition">
+        {{ post.author.nickname }}님의 글자국🐾
       </a>
-      {% if user.is_authenticated and user == post.author %}
-        <button type="button" onclick="openDeleteModal()" class="px-6 py-3 bg-red-400 hover:bg-red-600 text-white font-bold rounded-full shadow-lg transition">삭제</button>
-      {% endif %}
+      <a href="{% url 'explore' %}"
+        class="px-5 py-2 bg-[#F9DCC4] hover:bg-[#f7cbaa] text-[#493E3E] rounded-full font-bold transition">
+        글바다🌊
+      </a>
     </div>
     {% if user.is_authenticated and user == post.author %}
       <!-- 삭제 확인 모달 -->
@@ -192,6 +211,39 @@
         </div>
       </form>
     </div>
+
+    <!-- 홈/글자국/글바다 버튼 -->
+    <div class="flex items-center mt-4">
+      <!-- 좌측/가운데 비움 -->
+      <div class="flex-1"></div>
+      <div class="flex-1"></div>
+      <!-- 우측: 발행/발행취소, 삭제 -->
+      <div class="flex-1 flex justify-end space-x-2">
+        {% if user == post.author %}
+          <div class="absolute top-6 right-8 z-20 flex space-x-2">
+            <form method="post" action="{% url 'toggle_post_visibility' post.id %}" class="inline">
+              {% csrf_token %}
+              {% if not post.is_public %}
+                <input type="hidden" name="visibility" value="public">
+                <button type="submit"
+                        class="px-5 py-2 bg-[#F9DCC4] hover:bg-[#f7cbaa] text-[#493E3E] rounded-full font-bold text-sm transition">
+                  발행
+                </button>
+              {% else %}
+                <input type="hidden" name="visibility" value="private">
+                <button type="submit"
+                        class="px-5 py-2 bg-gray-300 hover:bg-gray-400 text-[#493E3E] rounded-full font-bold text-sm transition">
+                  발행취소
+                </button>
+              {% endif %}
+            </form>
+            <button type="button" onclick="openDeleteModal()" class="px-5 py-2 bg-red-400 hover:bg-red-600 text-white font-bold rounded-full shadow text-sm transition">
+              삭제
+            </button>
+          </div>
+        {% endif %}
+      </div>
+    </div>
   </div>
 
   <script>
@@ -213,6 +265,46 @@
           : '이 글은 나만 볼 수 있습니다.';
       });
     });
+
+    const likeBtn = document.getElementById('like-btn');
+    if (likeBtn) {
+  likeBtn.addEventListener('click', async function () {
+    const postId = this.dataset.postId;
+    const response = await fetch("{% url 'like' post.id %}", {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": "{{ csrf_token }}",
+        "X-Requested-With": "XMLHttpRequest"
+      }
+    });
+
+    const data = await response.json();
+    const heart = this.querySelector('.heart');
+    const count = this.querySelector('.like-count');
+
+    // 하트 애니메이션 float 생성
+    const float = document.createElement('div');
+    float.classList.add('like-float');
+    float.textContent = data.status === 'liked' ? '+1' : '-1';
+
+    // 버튼 기준 위치
+    const rect = this.getBoundingClientRect();
+    float.style.left = `${this.offsetLeft + 20}px`;
+    float.style.top = `${this.offsetTop - 10}px`;
+
+    // 카드에 삽입 (버튼 바로 위 부모 기준)
+    this.parentElement.appendChild(float);
+
+    // 일정 시간 뒤 제거
+    setTimeout(() => {
+      float.remove();
+    }, 800);
+
+    // 하트, 카운트 갱신
+    heart.textContent = data.status === 'liked' ? '❤️' : '🤍';
+    count.textContent = `(${data.count})`;
+  });
+}
   </script>
 </body>
 </html>
