@@ -40,18 +40,17 @@
   </style>
 
   <!-- ✅ 1. step-nav 버튼은 스크롤 이동으로 대체 -->
-  <div id="step-nav" class="fixed top-0 left-0 right-0 bg-white border-b shadow px-6 py-3 flex justify-center gap-4 z-50">
-    <a href="#step-1" class="step-nav-btn">1. 글감</a>
-    <a href="#step-poem" class="step-nav-btn">2. 한 방울</a>
-    <a href="#step-poem-2" class="step-nav-btn">3. 두 방울</a>
-    <a href="#step-poem-3" class="step-nav-btn">4. 세 방울</a>
-    <a href="#step-5" class="step-nav-btn">5. 글줄기</a>
-    <a href="{% url 'home' %}" class="step-nav-btn ml-auto">🏠 홈으로</a>
+  <div id="step-nav" class="...">
+    <button class="step-nav-btn" onclick="scrollToStep('step-1')">1. 글감</button>
+    <button class="step-nav-btn" onclick="scrollToStep('step-2')">2. 한 방울</button>
+    <button class="step-nav-btn" onclick="scrollToStep('step-3')">3. 두 방울</button>
+    <button class="step-nav-btn" onclick="scrollToStep('step-4')">4. 세 방울</button>
+    <button class="step-nav-btn" onclick="scrollToStep('step-5')">글줄기</button>
+    <button class="step-nav-btn" onclick="scrollToStep('step-6')">홈으로</button>
   </div>
 
   <!-- <div class="max-w-2xl mx-auto bg-white shadow-xl rounded-xl p-6 space-y-6 mt-24">
     <form method="post" action="" enctype="multipart/form-data"> -->
-      <!-- hj: csrf token 삽입 -->
       {% csrf_token %}
 
   <div class="flex justify-around items-start px-10 mt-24 relative">
@@ -60,7 +59,6 @@
     <div id="left-box"
         class="w-full lg:w-1/2 bg-white shadow-xl rounded-xl p-6 space-y-4 transition-all duration-700 transform mx-auto">
       <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
         
         <div class="step" id="step-1">
           {% comment %} 글감 선택 영역 {% endcomment %}
@@ -161,10 +159,10 @@
         {% csrf_token %}
     
     <!-- 오른쪽 가이드 템플릿 삽입 -->
-        <div id="guide-poem" class="mb-8 scroll-mt-28 hidden">{% include "post/_guide_poem.html" %}</div>
-        <div id="guide-essay" class="mb-8 scroll-mt-28 hidden">{% include "post/_guide_essay.html" %}</div>
-        <div id="guide-column" class="mb-8 scroll-mt-28 hidden">{% include "post/_guide_column.html" %}</div>
-        <div id="guide-analysis" class="mb-8 scroll-mt-28 hidden">{% include "post/_guide_analysis.html" %}</div>
+        <div id="guide-poem" class="step hidden">{% include "post/_guide_poem.html" %}</div>
+        <div id="guide-essay" class="step hidden">{% include "post/_guide_essay.html" %}</div>
+        <div id="guide-column" class="step hidden">{% include "post/_guide_column.html" %}</div>
+        <div id="guide-analysis" class="step hidden">{% include "post/_guide_analysis.html" %}</div>
 
         <div id="step-poem-2" class="step hidden">{% include "post/_guide_poem.html" %}</div>
         <div id="step-poem-3" class="step hidden">{% include "post/_guide_poem.html" %}</div>
