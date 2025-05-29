@@ -105,10 +105,12 @@
             </button>
           </div>
       
-      <!-- <div id="guide-poem" class="mb-8 scroll-mt-28">{% include "post/_guide_poem.html" %}</div>
+      {% comment %}
+      <div id="guide-poem" class="mb-8 scroll-mt-28">{% include "post/_guide_poem.html" %}</div>
       <div id="guide-essay" class="mb-8 scroll-mt-28">{% include "post/_guide_essay.html" %}</div>
       <div id="guide-column" class="mb-8 scroll-mt-28">{% include "post/_guide_column.html" %}</div>
-      <div id="guide-analysis" class="mb-8 scroll-mt-28">{% include "post/_guide_analysis.html" %}</div> -->
+      <div id="guide-analysis" class="mb-8 scroll-mt-28">{% include "post/_guide_analysis.html" %}</div>
+      {% endcomment %}
 
         <div class="step" id="step-5" style="display: none;">
           {% comment %} 글줄기 작성 영역 {% endcomment %}
@@ -185,7 +187,8 @@
     </div>
   </div>
 
-  <!-- <div id="summary-container" class="fixed bottom-4 right-4 z-50 text-sm text-[#493E3E] w-80">
+  {% comment %}
+  <div id="summary-container" class="fixed bottom-4 right-4 z-50 text-sm text-[#493E3E] w-80">
     <button onclick="toggleSummary()" class="bg-[#bae6fd] hover:bg-[#ffffff] px-4 py-2 rounded-t-xl w-full font-bold transition">
       도움글 보기 / 숨기기
     </button>
@@ -196,7 +199,8 @@
       <p><strong>두 방울:</strong> <span id="summary-step2"></span></p>
       <p><strong>세 방울:</strong> <span id="summary-step3"></span></p>
     </div>
-  </div> -->
+  </div>
+  {% endcomment %}
 
   <script>
 
@@ -232,6 +236,7 @@
     
   // 오른쪽 박스: 해당 형식 가이드 + 한 방울(2단계) 보여주기
       const genre = document.querySelector('input[name="genre"]:checked')?.value;
+      console.log("현재 장르:", genre);
       if (genre) {
         const guide = document.getElementById(`guide-${genre}`);
         const step2 = document.getElementById(`step-${genre}-2`);
