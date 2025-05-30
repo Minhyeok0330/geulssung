@@ -28,111 +28,110 @@
       pointer-events: none;
     }
   </style>
+
+
+  <!-- hj - chatbot 창 추가
+  <script src="{% static 'js/chatbot.js' %}"></script>
+  <div id="chat-box-wrapper" class="fixed bottom-24 right-4 w-80 z-50">
+    <button onclick="toggleChat()" class="w-full bg-[#bae6fd] text-[#493E3E] font-bold py-2 rounded-t-xl transition">
+      💬 챗봇 열기 / 닫기
+    </button>
+  </div> -->
+
+
 </head>
 <body class="relative bg-[#FFF9F2] min-h-screen pb-24 p-8 background">
-  <style>
-    .background{
-      background-image: url('{% static "images/바다만 덩그러니2.png" %}'); 
-      background-size: cover; 
-      background-position: center; 
-      background-repeat: no-repeat;
-    }
-  </style>
+    <style>
+      .background{
+        background-image: url('{% static "images/바다만 덩그러니2.png" %}'); 
+        background-size: cover; 
+        background-position: center; 
+        background-repeat: no-repeat;
+      }
+    </style>
 
-  <!-- ✅ 1. step-nav 버튼은 스크롤 이동으로 대체 -->
-  <div id="step-nav" class="...">
-    <button class="step-nav-btn" onclick="scrollToStep('step-1')">1. 글감</button>
-    <button class="step-nav-btn" onclick="scrollToStep('step-2')">2. 한 방울</button>
-    <button class="step-nav-btn" onclick="scrollToStep('step-3')">3. 두 방울</button>
-    <button class="step-nav-btn" onclick="scrollToStep('step-4')">4. 세 방울</button>
-    <button class="step-nav-btn" onclick="scrollToStep('step-5')">글줄기</button>
-    <button class="step-nav-btn" onclick="scrollToStep('step-6')">홈으로</button>
+  <div id="step-nav" class="fixed top-0 left-0 right-0 bg-white border-b shadow px-6 py-3 flex justify-center gap-4 z-50">
+    <button class="step-nav-btn" onclick="goToStep(1)">1. 글감</button>
+    <button class="step-nav-btn" onclick="goToStep(2)">2. 한 방울</button>
+    <button class="step-nav-btn" onclick="goToStep(3)">3. 두 방울</button>
+    <button class="step-nav-btn" onclick="goToStep(4)">4. 세 방울</button>
+    <button class="step-nav-btn" onclick="goToStep(5)">5. 글줄기</button>
+    <a href="{% url 'home' %}" class="step-nav-btn ml-auto">🏠 홈으로</a>
   </div>
-
-  <!-- <div class="max-w-2xl mx-auto bg-white shadow-xl rounded-xl p-6 space-y-6 mt-24">
-    <form method="post" action="" enctype="multipart/form-data"> -->
+  
+  <div id="glgamBox" class="max-w-2xl mx-auto bg-white shadow-xl rounded-xl p-6 space-y-6 mt-24 transition-transform duration-500 ease-in-out transform" style="transform: translateX(0);">
+    <form method="post" action="" enctype="multipart/form-data">
+      <!-- hj: csrf token 삽입 -->
       {% csrf_token %}
+    
 
-  <div class="flex justify-around items-start px-10 mt-24 relative">
-
-  <!-- 🔹 왼쪽: 기존 글감 선택 영역 -->
-    <div id="left-box"
-        class="w-full lg:w-1/2 bg-white shadow-xl rounded-xl p-6 space-y-4 transition-all duration-700 transform mx-auto">
-      <form method="post" enctype="multipart/form-data">
-        
-        <div class="step" id="step-1">
-          {% comment %} 글감 선택 영역 {% endcomment %}
-          <div class="mb-6">
-            <p class="font-semibold text-[#493E3E]">오늘의 글쓰기 도우미</p>
-            <div class="flex gap-4">
-              <label><input type="radio" name="category" value="emotion" onchange="showGenres(this.value)"> F감성 글썽이</label>
-              <label><input type="radio" name="category" value="logic" onchange="showGenres(this.value)"> T감성 말썽이</label>
-            </div>
-          </div>
-
-          <div class="mb-6" id="genre-emotion" style="display:none;">
-            <p class="font-semibold text-[#493E3E]">형식을 골라보세요 (글썽이)</p>
-            <div class="flex gap-4">
-              <label><input type="radio" name="genre" value="essay" onchange="showGuide(this.value)"> 에세이</label>
-              <label><input type="radio" name="genre" value="poem" onchange="showGuide(this.value)"> 시</label>
-            </div>
-          </div>
-
-          <div class="mb-6" id="genre-logic" style="display:none;">
-            <p class="font-semibold text-[#493E3E]">형식을 골라보세요 (말썽이)</p>
-            <div class="flex gap-4">
-              <label><input type="radio" name="genre" value="column" onchange="showGuide(this.value)"> 칼럼</label>
-              <label><input type="radio" name="genre" value="analysis" onchange="showGuide(this.value)"> 분석글</label>
-            </div>
-          </div>
-
-          <div id="prompt-box" class="mb-6" style="display: none;">
-            <p class="font-semibold text-[#493E3E] mb-2 flex items-center">
-              오늘의 글감을 골라보세요
-              <button type="button" id="refreshPromptsBtn" class="ml-2 px-2 py-1 rounded bg-[#bae6fd] text-black text-xs border border-[#7dd3fc]" style="vertical-align:middle;">
-                🔄 새로운 글감
-              </button>
-            </p>
-            <div id="prompt-options" class="grid grid-cols-1 gap-4"></div>
-            <input type="hidden" name="topic" id="selectedPrompt">
-            <input type="hidden" name="prompt_id" id="selectedPromptId">
-          </div>
-
-          <div class="flex justify-between mt-4">
-            <span></span>
-            <button type="button" id="step1NextBtn" onclick="nextStep()" class="bg-[#7dd3fc] text-[black] font-bold px-4 py-2 rounded-full opacity-50 pointer-events-none">
-              다음 →
-            </button>
-          </div>
       
-      {% comment %}
-      <div id="guide-poem" class="mb-8 scroll-mt-28">{% include "post/_guide_poem.html" %}</div>
-      <div id="guide-essay" class="mb-8 scroll-mt-28">{% include "post/_guide_essay.html" %}</div>
-      <div id="guide-column" class="mb-8 scroll-mt-28">{% include "post/_guide_column.html" %}</div>
-      <div id="guide-analysis" class="mb-8 scroll-mt-28">{% include "post/_guide_analysis.html" %}</div>
-      {% endcomment %}
-
-        <div class="step" id="step-5" style="display: none;">
-          {% comment %} 글줄기 작성 영역 {% endcomment %}
-        이미지 업로드
+      <div class="step" id="step-1">
+        <div class="mb-6">
+          <p class="font-semibold text-[#493E3E]">오늘의 글쓰기 도우미</p>
+          <div class="flex gap-4">
+            <label><input type="radio" name="category" value="emotion" onchange="showGenres(this.value)"> F감성 글썽이</label>
+            <label><input type="radio" name="category" value="logic" onchange="showGenres(this.value)"> T감성 말썽이</label>
+          </div>
+        </div>
+        
+        <div class="mb-6" id="genre-emotion" style="display:none;">
+          <p class="font-semibold text-[#493E3E]">형식을 골라보세요 (글썽이)</p>
+          <div class="flex gap-4">
+            <label><input type="radio" name="genre" value="essay" onchange="showGuide(this.value)"> 에세이</label>
+            <label><input type="radio" name="genre" value="poem" onchange="showGuide(this.value)"> 시</label>
+          </div>
+        </div>
+        
+        <div class="mb-6" id="genre-logic" style="display:none;">
+          <p class="font-semibold text-[#493E3E]">형식을 골라보세요 (말썽이)</p>
+          <div class="flex gap-4">
+            <label><input type="radio" name="genre" value="column" onchange="showGuide(this.value)"> 칼럼</label>
+            <label><input type="radio" name="genre" value="analysis" onchange="showGuide(this.value)"> 분석글</label>
+          </div>
+        </div>
+        
+        <div id="prompt-box" class="mb-6" style="display: none;">
+          <p class="font-semibold text-[#493E3E] mb-2 flex items-center">
+            오늘의 글감을 골라보세요
+            <button type="button" id="refreshPromptsBtn" class="ml-2 px-2 py-1 rounded bg-[#bae6fd] text-black text-xs border border-[#7dd3fc]" style="vertical-align:middle;">
+              🔄 새로운 글감
+            </button>
+          </p>
+          <div id="prompt-options" class="grid grid-cols-1 gap-4"></div>
+          <input type="hidden" name="topic" id="selectedPrompt">
+          <input type="hidden" name="prompt_id" id="selectedPromptId">
+        </div>
+        
+        <div class="flex justify-between mt-4">
+          <span></span>
+          <button type="button" id="step1NextBtn" onclick="nextStep(); moveBoxLeft();" class="bg-[#7dd3fc] text-[black] font-bold px-4 py-2 rounded-full">
+            다음 →
+          </button>
+        </div>
+      </div>
+      
+      
+      <div class="step" id="step-5" style="display: none;">
+        <!-- 이미지 업로드 -->
         <div class="mb-6">
           <label class="block font-semibold text-[black] mb-1">커버 이미지 업로드 (선택)</label>
           <input type="file" name="cover_image" id="coverImageInput" accept="image/*" class="hidden" onchange="showCoverPreview(event)" />
           <button type="button" onclick="document.getElementById('coverImageInput').click();" class="bg-[#bae6fd] text-black font-bold text-xs px-3 py-2 rounded-full shadow hover:bg-[#7dd3fc] hover:text-black border border-[#7dd3fc] transition-all focus:outline-none focus:ring-2 focus:ring-[#bae6fd]"> 커버 사진 선택</button>
-
           
-          이미지 미리보기
+          
+          <!-- 이미지 미리보기 -->
           <div id="coverImagePreviewContainer" class="mt-4 hidden">
             <p class="text-sm text-[#bae6fd] font-semibold mb-1">미리보기:</p>
             <img id="coverImagePreview" src="#" class="w-full h-48 object-cover rounded-lg border border-gray-200 shadow-sm" />
           </div>
         </div>
-
+        
         <div class="mb-6">
           <label class="block font-semibold text-[black] mb-1">제목</label>
           <input type="text" name="title" class="w-full border px-3 py-2 rounded-md" required />
         </div>
-
+        
         <div class="mb-8 mt-8">
           <p class="font-bold text-[black] text-lg mb-2">🧩 글줄기: 하나의 글로 완성해보세요</p>
           <p class="text-sm text-gray-700 mb-3">
@@ -141,113 +140,77 @@
           </p>
           <textarea name="final_text" rows="10" class="w-full border px-4 py-3 rounded-md shadow-sm" required></textarea>
         </div>
-
+        
         <div class="flex justify-between mt-4">
           <button type="button" onclick="prevStep()" class="bg-gray-200 px-4 py-2 rounded-full">← 이전</button>
           <button type="submit" class="bg-[#bae6fd] hover:bg-[#7dd3fc] text-[#493E3E] font-bold px-6 py-3 rounded-full transition">
-            제출하기</button>
+            제출하기
+          </button>
         </div>
-      </form>
+      </div>
+    </form>
+    <div id="summary-box" class="hidden">
+      <div id="summary-genre"></div>
+      <div id="summary-prompt"></div>
+      <div id="summary-step1"></div>
+      <div id="summary-step2"></div>
+      <div id="summary-step3"></div>
     </div>
+  </div> 
+  <div id="glgamBoxRight" class="fixed top-24 right-[-150%] w-[750px] h-[80vh] overflow-y-auto bg-white shadow-xl rounded-xl p-6 space-y-6 transition-all duration-500 ease-in-out" style="display: none;">
+    <div id="guide-analysis" style="display:none">{% include "post/_guide_analysis.html" %}</div>
+    <div id="guide-poem" style="display:none">{% include "post/_guide_poem.html" %}</div>
+    <div id="guide-essay" style="display:none">{% include "post/_guide_essay.html" %}</div>
+    <div id="guide-column" style="display:none">{% include "post/_guide_column.html" %}</div>
 
-<!-- 오른쪽에서 슬라이드 인 되는 컨테이너 박스 -->
-    <div id="right-box"
-        class="absolute top-24 right-[-8%] w-full lg:w-1/2 min-h-[500px] bg-white shadow-xl rounded-xl p-6 space-y-4
-              transform translate-x-full opacity-0 pointer-events-none
-              transition-all duration-700 z-20">
-
-  <!-- form 시작 -->
-      <form id="right-form" method="post" enctype="multipart/form-data" class="space-y-6">
-        {% csrf_token %}
-    
-    <!-- 오른쪽 가이드 템플릿 삽입 -->
-        <div id="guide-poem" class="step hidden">{% include "post/_guide_poem.html" %}</div>
-        <div id="guide-essay" class="step hidden">{% include "post/_guide_essay.html" %}</div>
-        <div id="guide-column" class="step hidden">{% include "post/_guide_column.html" %}</div>
-        <div id="guide-analysis" class="step hidden">{% include "post/_guide_analysis.html" %}</div>
-
-        <div id="step-poem-2" class="step hidden">{% include "post/_guide_poem.html" %}</div>
-        <div id="step-poem-3" class="step hidden">{% include "post/_guide_poem.html" %}</div>
-        <div id="step-poem-4" class="step hidden">{% include "post/_guide_poem.html" %}</div>
-
-        <div id="step-analysis-2" class="step hidden">{% include "post/_guide_analysis.html" %}</div>
-        <div id="step-analysis-3" class="step hidden">{% include "post/_guide_analysis.html" %}</div>
-        <div id="step-analysis-4" class="step hidden">{% include "post/_guide_analysis.html" %}</div>
-
-        <div id="step-column-2" class="step hidden">{% include "post/_guide_column.html" %}</div>
-        <div id="step-column-3" class="step hidden">{% include "post/_guide_column.html" %}</div>
-        <div id="step-column-4" class="step hidden">{% include "post/_guide_column.html" %}</div>
-
-        <div id="step-essay-2" class="step hidden">{% include "post/_guide_essay.html" %}</div>
-        <div id="step-essay-3" class="step hidden">{% include "post/_guide_essay.html" %}</div>
-        <div id="step-essay-4" class="step hidden">{% include "post/_guide_essay.html" %}</div>
-
-    <!-- 필요 시 input/textarea 등도 추가 가능 -->
-      </form>
-    </div>
+    <p class="text-lg font-bold text-[#493E3E]">✍️ 생각을 자유롭게 표현해 보세요!</p>
   </div>
-
-  {% comment %}
-  <div id="summary-container" class="fixed bottom-4 right-4 z-50 text-sm text-[#493E3E] w-80">
-    <button onclick="toggleSummary()" class="bg-[#bae6fd] hover:bg-[#ffffff] px-4 py-2 rounded-t-xl w-full font-bold transition">
-      도움글 보기 / 숨기기
-    </button>
-    <div id="summary-box" class="bg-white border border-black hover:bg-gray-100 shadow-xl p-4 rounded-b-2xl space-y-2 hidden">
-      <p><strong>형식:</strong> <span id="summary-genre"></span></p>
-      <p><strong>글감:</strong> <span id="summary-prompt"></span></p>
-      <p><strong>한 방울:</strong> <span id="summary-step1"></span></p>
-      <p><strong>두 방울:</strong> <span id="summary-step2"></span></p>
-      <p><strong>세 방울:</strong> <span id="summary-step3"></span></p>
-    </div>
-  </div>
-  {% endcomment %}
+</body>
 
   <script>
 
-    document.getElementById('step1NextBtn').addEventListener('click', () => {
-      const leftBox = document.getElementById('left-box');
-      const rightBox = document.getElementById('right-box');
+    function nextStep() {
+      const currentStep = document.querySelector(".step:not([style*='display: none']):not(#step-1)");
+      const currentStepId = currentStep.id ? currentStep.id : null;
 
-  // 왼쪽 박스 왼쪽으로 슬라이드
-      leftBox.classList.remove('translate-x-0');
-      leftBox.classList.add('-translate-x-1/2');
-
-  // 오른쪽 박스 슬라이드 인
-      rightBox.classList.remove('translate-x-full', 'opacity-0', 'pointer-events-none');
-      rightBox.classList.add('translate-x-[20vw]', 'opacity-100', 'pointer-events-auto');
-
-  // 왼쪽 박스 내용은 step-1 숨기고 step-5만 보이기
-      const step1 = document.getElementById('step-1');
-      const step5 = document.getElementById('step-5');
-      if (step1) step1.style.display = 'none';
-      if (step5) step5.style.display = 'block';
-
-    ['poem', 'essay', 'column', 'analysis'].forEach(type => {
-      const guide = document.getElementById(`guide-${type}`);
-      const step2 = document.getElementById(`step-${type}-2`);
-      const step3 = document.getElementById(`step-${type}-3`);
-      const step4 = document.getElementById(`step-${type}-4`);
-      if (guide) guide.style.display = 'none';
-      if (step2) step2.style.display = 'none';
-      if (step3) step3.style.display = 'none';
-      if (step4) step4.style.display = 'none';
-    });
-
-    
-  // 오른쪽 박스: 해당 형식 가이드 + 한 방울(2단계) 보여주기
-      const genre = document.querySelector('input[name="genre"]:checked')?.value;
-      console.log("현재 장르:", genre);
-      if (genre) {
-        const guide = document.getElementById(`guide-${genre}`);
-        const step2 = document.getElementById(`step-${genre}-2`);
-        const step3 = document.getElementById(`step-${genre}-3`);
-        const step4 = document.getElementById(`step-${genre}-4`);
-        if (guide) guide.style.display = 'block';
-        if (step2) step2.style.display = 'block';
-        if (step3) step3.style.display = 'block';
-        if (step4) step4.style.display = 'block';
+        // step-1은 절대 건드리지 않는다
+      if (currentStepId && currentStepId !== 'step-1') {
+        currentStep.style.display = 'none';
       }
-    });
+
+      if (currentStepId) {
+        const stepNum = parseInt(currentStepId.split("-")[1]);
+        const nextStepNum = stepNum + 1;
+        const nextStep = document.getElementById(`step-${nextStepNum}`);
+          
+      }
+
+        // step-1은 절대 숨기지 않도록 조건 추가
+      if (currentStepId !== 'step-1') {
+        currentStep.style.display = 'none';
+      }
+
+      if (nextStep) {
+        nextStep.style.display = 'block';
+      }
+    }
+
+    function moveBoxLeft() {
+      const box = document.getElementById('glgamBox');
+      box.style.transform = 'translateX(-400px)'; // 원하는 만큼 이동
+
+      const rightBox = document.getElementById('glgamBoxRight');
+
+      const step1 = document.getElementById('step-1');
+      if (step1) {
+        step1.style.display = 'block';
+      }
+      
+      rightBox.style.display = 'block'; // 등장하게 만들기
+      setTimeout(() => {
+        rightBox.style.right = '3%'; // 화면 안쪽으로 이동 → 애니메이션 발생
+      }, 10); // 살짝 delay를 줘야 transition 작동
+    }
 
 
     let currentStep = 1;
